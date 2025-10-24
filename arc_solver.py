@@ -321,6 +321,120 @@ class ARCTaskSolver:
         
         print()
     
+    def auto_solve_task(self, task_id: int) -> Dict[str, Any]:
+        """
+        Attempt to automatically solve a task using pattern recognition.
+        
+        Args:
+            task_id: Task number (1-400)
+            
+        Returns:
+            Dictionary containing solution results
+        """
+        from pattern_solutions import OptimizedSolutions, PatternSolutions
+        
+        task_data = self.load_task(task_id)
+        
+        # Try to detect pattern and get solution
+        pattern_type = self._detect_pattern(task_data)
+        solution_code = OptimizedSolutions.get_solution(pattern_type)
+        
+        if solution_code:
+            result = self.process_solution(task_id, solution_code, verbose=False)
+            if result['success']:
+                return result
+        
+        # If pattern-based solution failed, try brute force common patterns
+        common_solutions = [
+            OptimizedSolutions.TASK1,
+            OptimizedSolutions.ROTATE_90,
+            OptimizedSolutions.ROTATE_180,
+            OptimizedSolutions.FLIP_H,
+            OptimizedSolutions.FLIP_V,
+            OptimizedSolutions.TRANSPOSE,
+            OptimizedSolutions.SIMPLE_TILE_3X3,
+            OptimizedSolutions.IDENTITY
+        ]
+        
+        for solution in common_solutions:
+            result = self.process_solution(task_id, solution, verbose=False)
+            if result['success']:
+                return result
+        
+        return {
+            'task_id': task_id,
+            'success': False,
+            'message': 'No matching pattern found'
+        }
+    
+    def _detect_pattern(self, task_data: Dict[str, Any]) -> str:
+        """
+        Detect the transformation pattern in task data.
+        
+        Args:
+            task_data: Task data dictionary
+            
+        Returns:
+            Pattern type string
+        """
+        train_pairs = task_data.get('train', [])
+        if not train_pairs:
+            return 'unknown'
+        
+        # Check dimensions
+        first_pair = train_pairs[0]
+        inp = first_pair['input']
+        out = first_pair['output']
+        
+        in_h, in_w = len(inp), len(inp[0]) if inp else 0
+        out_h, out_w = len(out), len(out[0]) if out else 0
+        
+        # Task 1 pattern: 3x3 -> 9x9 conditional tiling
+        if in_h == 3 and in_w == 3 and out_h == 9 and out_w == 9:
+            if self._test_task1_pattern(inp, out):
+                return 'conditional_tiling_3x3'
+            else:
+                return 'simple_tiling_3x3'
+        
+        # Same dimensions - geometric transformation
+        if in_h == out_h and in_w == out_w:
+            return self._detect_geometric_pattern(train_pairs)
+        
+        return 'unknown'
+    
+    def _test_task1_pattern(self, inp: List[List[int]], out: List[List[int]]) -> bool:
+        """
+        Test if input/output matches Task 1 conditional tiling pattern.
+        """
+        from pattern_solutions import PatternSolutions
+        expected = PatternSolutions.task1_conditional_tiling(inp)
+        return expected == out
+    
+    def _detect_geometric_pattern(self, train_pairs: List[Dict]) -> str:
+        """
+        Detect geometric transformation pattern.
+        """
+        from pattern_solutions import PatternSolutions
+        
+        for pair in train_pairs:
+            inp = pair['input']
+            out = pair['output']
+            
+            if PatternSolutions.rotate_90_clockwise(inp) == out:
+                return 'rotate_90'
+            elif PatternSolutions.rotate_180(inp) == out:
+                return 'rotate_180'
+            elif PatternSolutions.flip_horizontal(inp) == out:
+                return 'flip_horizontal'
+            elif PatternSolutions.flip_vertical(inp) == out:
+                return 'flip_vertical'
+            elif PatternSolutions.transpose(inp) == out:
+                return 'transpose'
+            elif inp == out:
+                return 'identity'
+        
+        return 'unknown'
+    
     def process_solution(
         self,
         task_id: int,
@@ -571,6 +685,72 @@ Please provide your solution as a Python function.
         
         print("=" * 80)
         print()
+    
+    def batch_auto_solve(self, start_task: int = 1, end_task: int = 400) -> Dict[str, Any]:
+        """
+        Automatically solve multiple tasks using pattern recognition.
+        
+        Args:
+            start_task: First task number to solve
+            end_task: Last task number to solve (inclusive)
+            
+        Returns:
+            Dictionary with batch solving results
+        """
+        print("=" * 80)
+        print(f"AUTO-SOLVING TASKS {start_task} TO {end_task}")
+        print("=" * 80)
+        
+        results = {}
+        successful = 0
+        total_score = 0
+        
+        for task_id in range(start_task, end_task + 1):
+            try:
+                result = self.auto_solve_task(task_id)
+                results[task_id] = result
+                
+                if result['success']:
+                    successful += 1
+                    total_score += result['score']
+                    print(f"✓ Task {task_id:03d}: {result['score']} points ({result['byte_count']} bytes)")
+                else:
+                    print(f"✗ Task {task_id:03d}: {result.get('message', 'Failed')}")
+                
+                # Progress report every 50 tasks
+                if task_id % 50 == 0:
+                    success_rate = (successful / (task_id - start_task + 1)) * 100
+                    print(f"\nProgress: {successful}/{task_id - start_task + 1} solved ({success_rate:.1f}%), {total_score:,} points\n")
+                    
+            except Exception as e:
+                print(f"✗ Task {task_id:03d}: ERROR - {e}")
+                results[task_id] = {
+                    'task_id': task_id,
+                    'success': False,
+                    'message': f'Error: {e}'
+                }
+        
+        total_tasks = end_task - start_task + 1
+        success_rate = (successful / total_tasks) * 100
+        avg_score = total_score / successful if successful > 0 else 0
+        
+        print("\n" + "=" * 80)
+        print("BATCH AUTO-SOLVE RESULTS")
+        print("=" * 80)
+        print(f"Tasks solved: {successful}/{total_tasks} ({success_rate:.1f}%)")
+        print(f"Total score: {total_score:,} points")
+        print(f"Average score: {avg_score:.1f} points/task")
+        print(f"Projected total (400 tasks): {avg_score * 400:,.0f} points")
+        print("=" * 80)
+        
+        return {
+            'total_tasks': total_tasks,
+            'successful': successful,
+            'success_rate': success_rate,
+            'total_score': total_score,
+            'average_score': avg_score,
+            'results': results
+        }
     
     def batch_analyze_tasks(self, start_task: int = 1, end_task: int = 10) -> None:
         """

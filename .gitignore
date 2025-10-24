@@ -1,5 +1,5 @@
-# Dataset files (too large for GitHub, use Kaggle datasets instead)
-data/
+# Dataset files (data/ is now included in repo for Kaggle)
+# data/  # Uncommented - data folder is now tracked
 ARC-AGI/
 ARC-GEN-100K/
 *.zip
@@ -7,7 +7,7 @@ ARC-GEN-100K/
 # Generated outputs
 solutions/
 submissions/
-*.json
+# *.json  # Commented out so task JSON files can be tracked
 
 # Python cache
 __pycache__/

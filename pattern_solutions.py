@@ -102,8 +102,8 @@ class PatternSolutions:
 class OptimizedSolutions:
     """Ultra-compact solutions optimized for code golf scoring."""
     
-    # Task 1: Conditional tiling (optimized for minimum bytes)
-    TASK1 = "solve=lambda g:[[x for j in range(3)for x in(g[s]if g[i][j]else[0,0,0])]for i in range(3)for s in range(3)]"
+    # Task 1: Conditional tiling (fixed syntax)
+    TASK1 = "solve=lambda g:[[x for j in range(3)for x in(g[s]if g[i][j]else[0]*3)]for i in range(3)for s in range(3)]"
     
     # Alternative Task 1 (even shorter)
     TASK1_ALT = "solve=lambda g:sum([[[0]*3if g[i][j]==0 else g[s]for j in range(3)]for i in range(3)for s in range(3)],[])"

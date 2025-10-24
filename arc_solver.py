@@ -345,16 +345,8 @@ class ARCTaskSolver:
                 return result
         
         # If pattern-based solution failed, try brute force common patterns
-        common_solutions = [
-            OptimizedSolutions.TASK1,
-            OptimizedSolutions.ROTATE_90,
-            OptimizedSolutions.ROTATE_180,
-            OptimizedSolutions.FLIP_H,
-            OptimizedSolutions.FLIP_V,
-            OptimizedSolutions.TRANSPOSE,
-            OptimizedSolutions.SIMPLE_TILE_3X3,
-            OptimizedSolutions.IDENTITY
-        ]
+        from enhanced_patterns import EnhancedPatterns
+        common_solutions = EnhancedPatterns.get_all_patterns()
         
         for solution in common_solutions:
             result = self.process_solution(task_id, solution, verbose=False)

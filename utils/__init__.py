@@ -1,0 +1,86 @@
+"""
+Utility package for ARC-AGI task solving.
+
+This package provides common grid operations and pattern detection functions.
+"""
+
+from .grid_operations import (
+    rotate_90_clockwise,
+    rotate_90_counterclockwise,
+    rotate_180,
+    flip_horizontal,
+    flip_vertical,
+    transpose,
+    get_dimensions,
+    create_grid,
+    copy_grid,
+    extract_subgrid,
+    flatten,
+    count_value,
+    find_positions,
+    replace_value,
+    map_values,
+    apply_function,
+    overlay_grids,
+    tile_grid,
+    scale_grid,
+    find_bounding_box,
+    extract_object,
+    pad_grid,
+    get_neighbors,
+    is_symmetric_horizontal,
+    is_symmetric_vertical,
+    get_unique_values,
+    crop_to_content,
+)
+
+from .pattern_detection import (
+    detect_transformation_type,
+    analyze_color_distribution,
+    detect_objects,
+    detect_symmetry,
+    detect_repetition,
+    find_color_mappings,
+    analyze_task_complexity,
+    suggest_approach,
+)
+
+__all__ = [
+    # Grid operations
+    'rotate_90_clockwise',
+    'rotate_90_counterclockwise',
+    'rotate_180',
+    'flip_horizontal',
+    'flip_vertical',
+    'transpose',
+    'get_dimensions',
+    'create_grid',
+    'copy_grid',
+    'extract_subgrid',
+    'flatten',
+    'count_value',
+    'find_positions',
+    'replace_value',
+    'map_values',
+    'apply_function',
+    'overlay_grids',
+    'tile_grid',
+    'scale_grid',
+    'find_bounding_box',
+    'extract_object',
+    'pad_grid',
+    'get_neighbors',
+    'is_symmetric_horizontal',
+    'is_symmetric_vertical',
+    'get_unique_values',
+    'crop_to_content',
+    # Pattern detection
+    'detect_transformation_type',
+    'analyze_color_distribution',
+    'detect_objects',
+    'detect_symmetry',
+    'detect_repetition',
+    'find_color_mappings',
+    'analyze_task_complexity',
+    'suggest_approach',
+]

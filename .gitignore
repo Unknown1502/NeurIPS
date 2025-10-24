@@ -1,0 +1,41 @@
+# Dataset files (too large for GitHub, use Kaggle datasets instead)
+data/
+ARC-AGI/
+ARC-GEN-100K/
+*.zip
+
+# Generated outputs
+solutions/
+submissions/
+*.json
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# IDE settings
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Temporary files
+*.log
+*.tmp
+*~

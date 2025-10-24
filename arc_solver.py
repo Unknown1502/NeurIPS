@@ -331,27 +331,41 @@ class ARCTaskSolver:
         Returns:
             Dictionary containing solution results
         """
-        from pattern_solutions import OptimizedSolutions, PatternSolutions
+        import warnings
+        warnings.filterwarnings('ignore', category=SyntaxWarning)
         
         task_data = self.load_task(task_id)
         
-        # Try to detect pattern and get solution
-        pattern_type = self._detect_pattern(task_data)
-        solution_code = OptimizedSolutions.get_solution(pattern_type)
+        # Use ULTRA SOLVER - tests thousands of patterns
+        try:
+            from ultra_solver import ultra_auto_solve
+            
+            print(f"Task {task_id:03d}:", end=' ')
+            solution_code, success = ultra_auto_solve(task_id, task_data)
+            
+            if success and solution_code:
+                result = self.process_solution(task_id, solution_code, verbose=False)
+                if result['success']:
+                    return result
+        except ImportError:
+            pass
+        except Exception as e:
+            print(f"Error: {e}")
         
-        if solution_code:
-            result = self.process_solution(task_id, solution_code, verbose=False)
-            if result['success']:
-                return result
-        
-        # If pattern-based solution failed, try brute force common patterns
-        from enhanced_patterns import EnhancedPatterns
-        common_solutions = EnhancedPatterns.get_all_patterns()
-        
-        for solution in common_solutions:
-            result = self.process_solution(task_id, solution, verbose=False)
-            if result['success']:
-                return result
+        # Fallback to comprehensive patterns
+        try:
+            from comprehensive_patterns import ComprehensivePatterns
+            all_solutions = ComprehensivePatterns.get_all_solutions()
+            
+            for solution in all_solutions:
+                try:
+                    result = self.process_solution(task_id, solution, verbose=False)
+                    if result['success']:
+                        return result
+                except:
+                    continue
+        except ImportError:
+            pass
         
         return {
             'task_id': task_id,
